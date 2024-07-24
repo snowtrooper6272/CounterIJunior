@@ -2,33 +2,29 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class Counter : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI counter;
-    [SerializeField] private CounterStarter _counterStarter;
+    public UnityAction<float> ValueChanged;
 
     private float _currentValue = 0;
+    private bool _isRunningCoroutine;
 
-    private void OnEnable()
+    private void Update()
     {
-        _counterStarter.CounterRan += Change;
-    }
-
-    private void OnDisable()
-    {
-        _counterStarter.CounterRan -= Change;
-    }
-
-    public void Change(int countOfClicks) 
-    {
-        if (countOfClicks % 2 == 1)
+        if (Input.GetMouseButtonDown(0))
         {
-            StartCoroutine(IncreasingCounter());
-        }
-        else 
-        {
-            StopAllCoroutines();
+            if (_isRunningCoroutine == false) 
+            {
+                StartCoroutine(nameof(IncreasingCounter));
+                _isRunningCoroutine = true;
+            }
+            else 
+            {
+                StopAllCoroutines();
+                _isRunningCoroutine = false;
+            }
         }
     }
 
@@ -37,7 +33,7 @@ public class Counter : MonoBehaviour
         while (true) 
         {
             _currentValue += Time.deltaTime;
-            counter.text = _currentValue.ToString();
+            ValueChanged.Invoke(_currentValue);
 
             yield return null;
         }
