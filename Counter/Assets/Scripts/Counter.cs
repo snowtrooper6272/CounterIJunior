@@ -1,19 +1,20 @@
 using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
 
 public class Counter : MonoBehaviour
 {
+    [SerializeField] private float _interval;
+
     public UnityAction<float> ValueChanged;
 
+    private int _mousebutton = 0;
     private float _currentValue = 0;
     private bool _isRunningCoroutine;
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(_mousebutton))
         {
             if (_isRunningCoroutine == false) 
             {
@@ -22,7 +23,7 @@ public class Counter : MonoBehaviour
             }
             else 
             {
-                StopAllCoroutines();
+                StopCoroutine(nameof(IncreasingCounter));
                 _isRunningCoroutine = false;
             }
         }
@@ -30,10 +31,18 @@ public class Counter : MonoBehaviour
 
     private IEnumerator IncreasingCounter() 
     {
+        float currentTime = 0;
+
         while (true) 
         {
-            _currentValue += Time.deltaTime;
-            ValueChanged.Invoke(_currentValue);
+            currentTime += Time.deltaTime;
+
+            if (currentTime >= _interval) 
+            {
+                _currentValue++;
+                currentTime = 0;
+                ValueChanged.Invoke(_currentValue);
+            }
 
             yield return null;
         }
