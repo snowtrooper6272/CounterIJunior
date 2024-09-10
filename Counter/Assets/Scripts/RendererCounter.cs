@@ -17,7 +17,7 @@ public class RendererCounter : MonoBehaviour
         _counter.ValueChanged -= ChangeText;
     }
 
-    public void ChangeText(float value) 
+    private void ChangeText(float value) 
     {
         _counterText.text = value.ToString();
     }

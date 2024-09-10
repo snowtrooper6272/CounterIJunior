@@ -6,24 +6,26 @@ public class Counter : MonoBehaviour
 {
     [SerializeField] private float _interval;
 
-    public UnityAction<float> ValueChanged;
+    public event UnityAction<float> ValueChanged;
 
-    private int _mousebutton = 0;
+    Coroutine _increasingCounter;
+
+    private int _mouseButton = 0;
     private float _currentValue = 0;
     private bool _isRunningCoroutine;
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(_mousebutton))
+        if (Input.GetMouseButtonDown(_mouseButton))
         {
             if (_isRunningCoroutine == false) 
             {
-                StartCoroutine(nameof(IncreasingCounter));
+                _increasingCounter = StartCoroutine(IncreasingCounter());
                 _isRunningCoroutine = true;
             }
             else 
             {
-                StopCoroutine(nameof(IncreasingCounter));
+                StopCoroutine(_increasingCounter);
                 _isRunningCoroutine = false;
             }
         }
@@ -31,20 +33,11 @@ public class Counter : MonoBehaviour
 
     private IEnumerator IncreasingCounter() 
     {
-        float currentTime = 0;
-
         while (true) 
         {
-            currentTime += Time.deltaTime;
-
-            if (currentTime >= _interval) 
-            {
-                _currentValue++;
-                currentTime = 0;
-                ValueChanged.Invoke(_currentValue);
-            }
-
-            yield return null;
+            _currentValue++;
+            ValueChanged.Invoke(_currentValue);
+            yield return new WaitForSeconds(_interval);
         }
     }
 }
